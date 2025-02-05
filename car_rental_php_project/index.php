@@ -1,8 +1,21 @@
+<?php
+// Include database connection
+require_once 'db.php';
+session_start();
+
+// Fetch all cars
+$query = "SELECT c.*, cat.category_name FROM cars c 
+          JOIN car_categories cat ON c.CAT_ID = cat.ID";
+$result = $conn->query($query);
+?>
+
+
+
 <!doctype html>
 <html lang="en">
 
   <head>
-    <title>Ride Now Rentals &mdash;</title>
+    <title>CarRental &mdash; Free Website Template by Colorlib</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -46,7 +59,7 @@
 
             <div class="col-3">
               <div class="site-logo">
-                <a href="index.html"><strong>Ride Now Rentals</strong></a>
+                <a href="index.html"><strong>CarRental</strong></a>
               </div>
             </div>
 
@@ -57,21 +70,20 @@
               <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
                 <ul class="site-menu main-menu js-clone-nav ml-auto ">
                   <li class="active"><a href="index.php" class="nav-link">Home</a></li>
-                  <li><a href="listing.html" class="nav-link">Cars</a></li>
+                  <li><a href="listing.html" class="nav-link">Listing</a></li>
+                  <li><a href="testimonials.html" class="nav-link">Testimonials</a></li>
+                  <li><a href="blog.html" class="nav-link">Blog</a></li>
                   <li><a href="about.html" class="nav-link">About</a></li>
                   <li><a href="contact.html" class="nav-link">Contact</a></li>
                   <?php
-                  session_start();
-                  ?>
-                  <?php
+               
                   if (isset($_SESSION['user_id'])) {
-                    echo '<li><a href="logout.php" class="nav-link">Bookings</a></li>';
+                    echo '<li><a href="user_side/view_bookings.php" class="nav-link">Bookings</a></li>';
                     echo '<li><a href="logout.php" class="nav-link">logout</a></li>';
                   } else {
                       echo '<li><a href="login.php" class="nav-link">login</a></li>';
                   }
                   ?>
-
                 </ul>
               </nav>
             </div>
@@ -216,211 +228,79 @@
         
 
         <div class="row">
-          <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="images/car_6.jpg" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3>Mitsubishi Pajero</h3>
-                <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
-                  </div>
-                </div>
-                <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
+        <?php while ($car = $result->fetch_assoc()): ?>
 
           <div class="col-md-6 col-lg-4 mb-4">
 
             <div class="listing d-block  align-items-stretch">
               <div class="listing-img h-100 mr-4">
-                <img src="images/car_5.jpg" alt="Image" class="img-fluid">
+                <img src="uploads/<?php echo htmlspecialchars($car['vehicle_image']); ?>" alt="Image" class="img-fluid">
               </div>
               <div class="listing-contents h-100">
-                <h3>Nissan Moco</h3>
+                <h3><?php echo htmlspecialchars($car['vehicle_name']); ?></h3>
                 <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
+                  <strong>₹<?php echo htmlspecialchars($car['price']); ?></strong><span class="mx-1">/</span>day
                 </div>
                 <div class="d-block d-md-flex mb-3 border-bottom pb-3">
                   <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
+                    <span class="caption">seatings:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['seating_capacity']); ?></span>
                   </div>
                   <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
+                    <span class="caption">fuel_type:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['fuel_type']); ?></span>
                   </div>
                   <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
+                    <span class="caption">gear_type:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['gear_type']); ?></span>
                   </div>
                 </div>
                 <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
+                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
+                  <div class="listing-feature pr-4">
+                    <span class="caption">vehicle_number:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['vehicle_number']); ?></span>
+                  </div>
+                  <div class="listing-feature pr-4">
+                    <span class="caption">rc_number:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['rc_number']); ?></span>
+                  </div>
+                  <div class="listing-feature pr-4">
+                    <span class="caption">ac_status:</span>
+                    <span class="number"><?php echo htmlspecialchars($car['ac_status']); ?></span>
+                  </div>
+                </div>
+                  <p><?php echo htmlspecialchars($car['vehicle_name']); ?> – A premium <?php echo htmlspecialchars($car['category_name']); ?> 
+                  with <?php echo htmlspecialchars($car['seating_capacity']); ?>-seater capacity,
+                  <?php echo htmlspecialchars($car['gear_type']); ?> transmission, and <?php echo htmlspecialchars($car['ac_status']); ?>, perfect for comfortable trips.</p>
+                  <?php
+               
+               if (isset($_SESSION['user_id'])) {
+                 echo '<p><a href="user_side/rent.php?car_id=' . $car['vehicle_id'] . '" class="btn btn-primary btn-sm">Rent Now</a></p>';
+               } else {
+                   echo '<p><a href="login.php" class="btn btn-primary btn-sm">Rent Now</a></p>';
+               }
+               ?>
+                  
+                  
                 </div>
               </div>
 
             </div>
           </div>
+        <?php endwhile; ?>
+
+       
           
 
-          <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="images/car_4.jpg" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3>Honda Fitta</h3>
-                <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
-                  </div>
-                </div>
-                <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="images/car_3.jpg" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3>Skoda Laura</h3>
-                <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
-                  </div>
-                </div>
-                <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="images/car_2.jpg" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3>Mazda LaPuta</h3>
-                <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
-                  </div>
-                </div>
-                <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
           
 
-          <div class="col-md-6 col-lg-4 mb-4">
+          
 
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="images/car_1.jpg" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3>Buick LaCrosse</h3>
-                <div class="rent-price">
-                  <strong>$389.00</strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Luggage:</span>
-                    <span class="number">8</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Doors:</span>
-                    <span class="number">4</span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">Passenger:</span>
-                    <span class="number">4</span>
-                  </div>
-                </div>
-                <div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos eos at eum, voluptatem quibusdam.</p>
-                  <p><a href="#" class="btn btn-primary btn-sm">Rent Now</a></p>
-                </div>
-              </div>
+          
+          
 
-            </div>
-          </div>
+          
 
         </div>
       </div>

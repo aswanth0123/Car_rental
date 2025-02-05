@@ -31,11 +31,11 @@ echo " Welcome to the Admin Dashboard!";
       
       <nav role='navigation'>
         <ul class="main">
-          <li class=""><a href="perfume_home">Dashboard</a></li>
+          <li class=""><a href="vendor_dashboard.php">Dashboard</a></li>
           <li class=""><a href="add_cars.php">Add Cars</a></li>
-          <li class=""><a href="manage_products">View Cars</a></li>
-          <li class=""><a href="add_category">View Category</a></li>
-          <li class=""><a href="view_bookings">Manage Bookings</a></li>
+          <li class=""><a href="view_cars.php">View Cars</a></li>
+          <li class=""><a href="add_cate.php">View Category</a></li>
+          <li class=""><a href="bookings.php">Manage Bookings</a></li>
           <li class=""><a href="view_feedbacks">feedbacks</a></li>
 
         </ul>
