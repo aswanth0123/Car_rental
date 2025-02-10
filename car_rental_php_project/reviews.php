@@ -2,23 +2,34 @@
 // Include database connection
 require_once 'db.php';
 session_start();
+$user_id = $_SESSION['user_id'];
 
-// Fetch all cars
-$query = "SELECT c.*, cat.category_name FROM cars c 
-          JOIN car_categories cat ON c.CAT_ID = cat.ID";
-$result = $conn->query($query);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $date = date("Y-m-d H:i:s");
+    $rev = $_POST['rev'];
+    $query = "insert into Feedback (CustomerID,FeedbackDescription,ReviewDateTime)
+    values(?,?,?) ";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('iss',$user_id,$rev,$date);
+    if ($stmt->execute()) {
+        echo "";
+    } else {
+        echo "Error: " . $conn->error;
+    }
 
+}
 
 $sql = "SELECT f.FeedbackID, f.FeedbackDescription, f.ReviewDateTime, c.name AS customer_name 
         FROM feedback f 
         JOIN users c ON f.CustomerID = c.user_id 
-        ORDER BY f.ReviewDateTime DESC limit 3";
+        ORDER BY f.ReviewDateTime DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-$result1 = $stmt->get_result();
+$result = $stmt->get_result();
 
 ?>
+
 
 
 
@@ -102,159 +113,22 @@ $result1 = $stmt->get_result();
         </div>
 
       </header>
-
       
-      <div class="hero" style="background-image: url('images/hero_1_a.jpg');">
+      <div class="hero inner-page" style="background-image: url('images/hero_1_a.jpg');">
         
         <div class="container">
-          <div class="row align-items-center justify-content-center">
-            <div class="col-lg-10">
+          <div class="row align-items-end ">
+            <div class="col-lg-5">
 
-              <div class="row mb-5">
-                <div class="col-lg-7 intro">
-                  <h1><strong>Rent a car</strong> is within your finger tips.</h1>
-                </div>
+              <div class="intro">
+                <h1><strong>Reviews</strong></h1>
+                <div class="custom-breadcrumbs"><a href="index.php">Home</a> <span class="mx-2">/</span> <strong>Reviews</strong></div>
               </div>
 
             </div>
           </div>
         </div>
       </div>
-  
-
-
-      <div class="site-section">
-        <div class="container">
-          <h2 class="section-heading"><strong>How it works?</strong></h2>
-          <p class="mb-5">Easy steps to get you started</p>    
-
-          <div class="row mb-5">
-            <div class="col-lg-4 mb-4 mb-lg-0">
-              <div class="step">
-                <span>1</span>
-                <div class="step-inner">
-                  <span class="number text-primary">01.</span>
-                  <h3>Select a car</h3>
-                  <p>Browse through a variety of available vehicles and choose the one that best suits your needs and preferences.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 mb-4 mb-lg-0">
-              <div class="step">
-                <span>2</span>
-                <div class="step-inner">
-                  <span class="number text-primary">02.</span>
-                  <h3>Fill up form</h3>
-                  <p>Provide your personal details, rental dates, and any additional requirements in the booking form to proceed with the reservation.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 mb-4 mb-lg-0">
-              <div class="step">
-                <span>3</span>
-                <div class="step-inner">
-                  <span class="number text-primary">03.</span>
-                  <h3>Payment</h3>
-                  <p>Securely complete the transaction using your preferred payment method to confirm your car rental booking.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
-
-      
-
-    <div class="site-section bg-light">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-7">
-            <h2 class="section-heading"><strong>Car Listings</strong></h2>
-            <p class="mb-5">Explore a wide range of vehicles with detailed descriptions, pricing, and availability to find the perfect car for your rental needs.</p>    
-          </div>
-        </div>
-        
-
-        <div class="row">
-        <?php while ($car = $result->fetch_assoc()): ?>
-
-          <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="listing d-block  align-items-stretch">
-              <div class="listing-img h-100 mr-4">
-                <img src="uploads/<?php echo htmlspecialchars($car['vehicle_image']); ?>" alt="Image" class="img-fluid">
-              </div>
-              <div class="listing-contents h-100">
-                <h3><?php echo htmlspecialchars($car['vehicle_name']); ?></h3>
-                <div class="rent-price">
-                  <strong>₹<?php echo htmlspecialchars($car['price']); ?></strong><span class="mx-1">/</span>day
-                </div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">seatings:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['seating_capacity']); ?></span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">fuel_type:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['fuel_type']); ?></span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">gear_type:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['gear_type']); ?></span>
-                  </div>
-                </div>
-                <div>
-                <div class="d-block d-md-flex mb-3 border-bottom pb-3">
-                  <div class="listing-feature pr-4">
-                    <span class="caption">vehicle_number:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['vehicle_number']); ?></span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">rc_number:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['rc_number']); ?></span>
-                  </div>
-                  <div class="listing-feature pr-4">
-                    <span class="caption">ac_status:</span>
-                    <span class="number"><?php echo htmlspecialchars($car['ac_status']); ?></span>
-                  </div>
-                </div>
-                  <p><?php echo htmlspecialchars($car['vehicle_name']); ?> – A premium <?php echo htmlspecialchars($car['category_name']); ?> 
-                  with <?php echo htmlspecialchars($car['seating_capacity']); ?>-seater capacity,
-                  <?php echo htmlspecialchars($car['gear_type']); ?> transmission, and <?php echo htmlspecialchars($car['ac_status']); ?>, perfect for comfortable trips.</p>
-                  <?php
-               
-               if (isset($_SESSION['user_id'])) {
-                 echo '<p><a href="user_side/rent.php?car_id=' . $car['vehicle_id'] . '" class="btn btn-primary btn-sm">Rent Now</a></p>';
-               } else {
-                   echo '<p><a href="login.php" class="btn btn-primary btn-sm">Rent Now</a></p>';
-               }
-               ?>
-                  
-                  
-                </div>
-              </div>
-
-            </div>
-          </div>
-        <?php endwhile; ?>
-
-       
-          
-
-          
-
-          
-
-          
-          
-
-          
-
-        </div>
-      </div>
-    </div>
 
 
 
@@ -262,13 +136,32 @@ $result1 = $stmt->get_result();
       <div class="container">
         <div class="row">
           <div class="col-lg-7">
-            <h2 class="section-heading"><strong>Feedback</strong></h2>
-            <p class="mb-5">Some Customers Feedbacks</p>    
-          </div>
+            <h2 class="section-heading"><strong>Reviews</strong></h2>
+            <p>Some customers have reviewed us.</p>    
+            <?php
+              if (isset($_SESSION['user_id'])) {
+                ?>
+                <form action="" method="POST">
+                <div class="form-group row">
+                <div class="col-md-6 mb-4 mb-lg-0">
+                  <input type="text" class="form-control" placeholder="Your review" name="rev" required>
+                </div>
+                <div class="col-md-6">
+                  <input type="submit" class="btn btn-info mt-2" >
+                </div>
+              </div>
+          </form>
+          <?php
+
+              }
+
+            ?>
+                    </div>
+
         </div>
         <div class="row">
-        <?php
-          foreach($result1 as $rev){
+          <?php
+          foreach($result as $rev){
             ?>
           <div class="col-lg-4 mb-4">
           <div class="testimonial-2">
@@ -287,6 +180,8 @@ $result1 = $stmt->get_result();
         <?php
           }
           ?>
+          
+
         </div>
       </div>
     </div>

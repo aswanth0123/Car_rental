@@ -1,23 +1,18 @@
 <?php
 session_start();
-if (!isset($_SESSION['vendor_id']) || $_SESSION['role'] !== 'vendor') {
+require_once '../db.php';
+if (!isset($_SESSION['admin_id'])) {
     header("Location: ../login.php");
     exit;
 }
-require_once '../db.php';
 
-$vendor_id = $_SESSION['vendor_id'];
-
-// Fetch cars for the current vendor
 $query = "SELECT cars.vehicle_id, cars.vehicle_name, cars.vehicle_number, cars.rc_number, 
                  cars.insurance_policy_number, cars.fuel_type, cars.seating_capacity, 
                  cars.ac_status, cars.gear_type, cars.vehicle_image,cars.price,
                  car_categories.category_name 
           FROM cars 
-          JOIN car_categories ON cars.cat_id = car_categories.id
-          WHERE cars.vendor_id = ?";
+          JOIN car_categories ON cars.cat_id = car_categories.id";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $vendor_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -36,25 +31,24 @@ $result = $stmt->get_result();
 <body>
     
     <header role="banner">
-        <h1>Vendor Panel</h1>
+        <h1>Admin Panel</h1>
         <ul class="utilities">
           <br>
-          <li class="users"><a href="profile.php">My Account</a></li>
           <li class="logout warn"><a href="../logout.php">Log Out</a></li>
         </ul>
       </header>
       
       <nav role='navigation'>
         <ul class="main">
-        <li class=""><a href="vendor_dashboard.php">Dashboard</a></li>
-          <li class=""><a href="add_cars.php">Add Cars</a></li>
-          <li class=""><a href="view_cars.php">View Cars</a></li>
-          <li class=""><a href="add_cate.php">View Category</a></li>
-          <li class=""><a href="bookings.php">Manage Bookings</a></li>
-          <li class=""><a href="view_feedback.php">feedbacks</a></li>
-
+          <li class=""><a href="home.php">Dashboard</a></li>
+          <li class=""><a href="cars.php">Cars</a></li>
+          <li class=""><a href="users.php">users</a></li>
+          <li class=""><a href="vendors.php">Vendors</a></li>
+          <li class=""><a href="cates.php">Categorys</a></li>
+          <li class=""><a href="bookings.php">Bookings</a></li>
+          <li class=""><a href="feedbacks.php">feedbacks</a></li>
         </ul>
-      </nav>
+      </nav>    
       <main role="main">
         
         <!-- Manage Products Section -->
@@ -77,8 +71,7 @@ $result = $stmt->get_result();
                       <span>vehicle_number: <?php echo htmlspecialchars($pro['vehicle_number']); ?></span><br>
                       <span style="">Price : ₹<?php echo htmlspecialchars($pro['price']); ?></span>
                     </p>
-                    <a href="edit_cars.php?id=<?php echo htmlspecialchars($pro['vehicle_id']); ?>" class="btn btn-primary">Edit</a>
-                    <a href="delete_car.php?id=<?php echo htmlspecialchars($pro['vehicle_id']); ?>" class="btn btn-primary">Delete</a>
+               
                   </div>
                 </div><br>
                 </div>

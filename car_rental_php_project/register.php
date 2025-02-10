@@ -10,18 +10,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $company_registration_number = $_POST['company_registration_number'] ?? null;
     $driving_license_number = $_POST['driving_license_number'] ?? null;
     $address = $_POST['address'] ?? null;
-
-    $sql = "INSERT INTO users (name, phone_number, email, role,company_registration_number, driving_license_number, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssss",
-        $name,
-        $phone_number,
-        $email,
-        $role,
-        $company_registration_number,
-        $driving_license_number,
-        $address,
-        $password);
+    if($role == 'vendor'){
+        $sql = "INSERT INTO vendor (name, phone_number, email, company_registration_number, address, password) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssss",
+            $name,
+            $phone_number,
+            $email,
+            $company_registration_number,
+            $address,
+            $password);
+    }
+    else{
+        $sql = "INSERT INTO users (name, phone_number, email, driving_license_number, address, password) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssss",
+            $name,
+            $phone_number,
+            $email,
+            $driving_license_number,
+            $address,
+            $password);
+        
+    }
+    
 
     if ($stmt->execute()) {
         echo "Registration successful!";
@@ -45,13 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="login-input-user" class="login__label">
                 Full-Name
             </label>
-            <input id="login-input-user" class="login__input" type="text" name="username" />
+            <input id="login-input-user" class="login__input" type="text" name="username" required />
     
     
             <label for="login-input-user" class="login__label">
                 E-mail
             </label>
-            <input id="login-input-user" class="login__input" type="email" name="email" />
+            <input id="login-input-user" class="login__input" type="email" name="email" required />
             <label for="login-input-user" class="login__label">
                 Role
             </label>
@@ -64,17 +76,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div id="vendor-fields" style="display: none;margin-top: 30px;">
 
                 <label for="company_registration_number" class="login__label">Company Registration Number:</label>
-                <input type="text" name="company_registration_number" id="company_registration_number" class="login__input"><br><br>
+                <input type="text" name="company_registration_number" id="company_registration_number" class="login__input" ><br><br>
             </div>
 
             <div id="vendor-field" style="display: none;margin-top: 30px;">
 
             <label for="driving_license_number" class="login__label" style="margin-top: 30px;">Driving License Number:</label>
-            <input type="text" name="driving_license_number" id="driving_license_number" class="login__input">
+            <input type="text" name="driving_license_number" id="driving_license_number" class="login__input" >
             </div>
 
             <label for="address" class="login__label" style="margin-top: 30px;">Address:</label>
-            <textarea name="address" id="address" class="login__input"></textarea>
+            <textarea name="address" id="address" class="login__input" required></textarea>
 
             <label for="phone_number" class="login__label">Phone Number:</label>
             <input type="text" name="phone_number" id="phone_number" minlength="10" maxlength="10" pattern="[6-9].{9}" required class="login__input">
@@ -82,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="login-input-password" class="login__label">
                 Password
             </label>
-            <input id="login-input-password" class="login__input" type="password" name="password" />
+            <input id="login-input-password" class="login__input" type="password" name="password" required />
     
     
     

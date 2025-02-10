@@ -43,7 +43,7 @@ $result = $stmt->get_result();
 <html lang="en">
 
   <head>
-    <title>CarRental &mdash; Free Website Template by Colorlib</title>
+    <title>RIDE NOW RENTALS &mdash; Free Website Template by Colorlib</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -87,7 +87,7 @@ $result = $stmt->get_result();
 
             <div class="col-3">
               <div class="site-logo">
-                <a href="index.html"><strong>CarRental</strong></a>
+                <a href="../index.php"><strong>RIDE NOW RENTALS</strong></a>
               </div>
             </div>
 
@@ -97,12 +97,19 @@ $result = $stmt->get_result();
 
               <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
                 <ul class="site-menu main-menu js-clone-nav ml-auto ">
-                  <li><a href="../index.php" class="nav-link">Home</a></li>
-                  <li class="active"><a href="listing.html" class="nav-link">Listing</a></li>
-                  <li><a href="testimonials.html" class="nav-link">Testimonials</a></li>
-                  <li><a href="blog.html" class="nav-link">Blog</a></li>
-                  <li><a href="about.html" class="nav-link">About</a></li>
-                  <li><a href="contact.html" class="nav-link">Contact</a></li>
+                  <li class="active"><a href="../index.php" class="nav-link">Home</a></li>
+                  <li><a href="../reviews.php" class="nav-link">Reviews</a></li>
+                  <li><a href="../about.php" class="nav-link">About</a></li>
+                  <?php
+               
+                  if (isset($_SESSION['user_id'])) {
+                    echo '<li><a href="view_bookings.php" class="nav-link">Bookings</a></li>';
+                    echo '<li><a href="profile.php" class="nav-link">profile</a></li>';
+                    echo '<li><a href="logout.php" class="nav-link">logout</a></li>';
+                  } else {
+                      echo '<li><a href="login.php" class="nav-link">login</a></li>';
+                  }
+                  ?>
                 </ul>
               </nav>
             </div>
@@ -122,7 +129,7 @@ $result = $stmt->get_result();
 
               <div class="intro">
                 <h1><strong>Bookings</strong></h1>
-                <div class="custom-breadcrumbs"><a href="index.html">Home</a> <span class="mx-2">/</span> <strong>Listings</strong></div>
+                <div class="custom-breadcrumbs"><a href="../index.php">Home</a> <span class="mx-2">/</span> <strong>Bookings</strong></div>
               </div>
 
             </div>
@@ -173,7 +180,7 @@ $result = $stmt->get_result();
                         <?php 
                          $pickup_date = date('Y-m-d', strtotime($row['pickup_timestamp']));
                          $current_date = date('Y-m-d');
-                        if ($row['status'] == 'confirmed'  && $pickup_date != $current_date) { ?>
+                        if ($row['status'] == 'confirmed'  && $pickup_date > $current_date) { ?>
                             <form method="POST" action="" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
                                 <input type="hidden" name="rent_id" value="<?php echo $row['rent_id']; ?>">
                                 <button type="submit" class="btn btn-danger">Cancel</button>
@@ -181,7 +188,10 @@ $result = $stmt->get_result();
                         <?php }
                         
                         else { ?>
-                            <button class="btn btn-secondary" disabled>Cannot Cancel</button>
+                            <!-- <button class="btn btn-secondary" disabled>mark feedback</button> -->
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+                            mark feedback
+  </button>
                         <?php } ?>
                         </td>
                     </tr>
@@ -194,72 +204,44 @@ $result = $stmt->get_result();
       </div>
     </div>
 
-    
-
-    <div class="site-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-7">
-            <h2 class="section-heading"><strong>Testimonials</strong></h2>
-            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>    
-          </div>
+    <div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Write your feedback</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
-        <div class="row">
-          <div class="col-lg-4 mb-4 mb-lg-0">
-            <div class="testimonial-2">
-              <blockquote class="mb-4">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem, deserunt eveniet veniam. Ipsam, nam, voluptatum"</p>
-              </blockquote>
-              <div class="d-flex v-card align-items-center">
-                <img src="images/person_1.jpg" alt="Image" class="img-fluid mr-3">
-                <div class="author-name">
-                  <span class="d-block">Mike Fisher</span>
-                  <span>Owner, Ford</span>
-                </div>
-              </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+        <form action="" method="POST">
+            <div class="form-group">
+                <label for="feedback">Feedback:</label>
+                <input type="text" class="form-control" id="feedback" name="feedback" required>
             </div>
-          </div>
-          <div class="col-lg-4 mb-4 mb-lg-0">
-            <div class="testimonial-2">
-              <blockquote class="mb-4">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem, deserunt eveniet veniam. Ipsam, nam, voluptatum"</p>
-              </blockquote>
-              <div class="d-flex v-card align-items-center">
-                <img src="images/person_2.jpg" alt="Image" class="img-fluid mr-3">
-                <div class="author-name">
-                  <span class="d-block">Jean Stanley</span>
-                  <span>Traveler</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 mb-4 mb-lg-0">
-            <div class="testimonial-2">
-              <blockquote class="mb-4">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem, deserunt eveniet veniam. Ipsam, nam, voluptatum"</p>
-              </blockquote>
-              <div class="d-flex v-card align-items-center">
-                <img src="images/person_3.jpg" alt="Image" class="img-fluid mr-3">
-                <div class="author-name">
-                  <span class="d-block">Katie Rose</span>
-                  <span >Customer</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
         </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+        
       </div>
     </div>
-
-    <div class="site-section bg-primary py-5">
+  </div>
+  <div class="site-section bg-primary py-5">
       <div class="container">
         <div class="row align-items-center">
           <div class="col-lg-7 mb-4 mb-md-0">
             <h2 class="mb-0 text-white">What are you waiting for?</h2>
-            <p class="mb-0 opa-7">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati, laboriosam.</p>
+            <p class="mb-0 opa-7"> Book your ideal car now and enjoy a seamless rental experience tailored just for you!</p>
           </div>
           <div class="col-lg-5 text-md-right">
-            <a href="#" class="btn btn-primary btn-white">Rent a car now</a>
+            <a href=".listing" class="btn btn-primary btn-white">Rent a car now</a>
           </div>
         </div>
       </div>
@@ -271,7 +253,7 @@ $result = $stmt->get_result();
           <div class="row">
             <div class="col-lg-3">
               <h2 class="footer-heading mb-4">About Us</h2>
-              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. </p>
+              <p>Welcome to our Car Rental System, a convenient and user-friendly platform designed to simplify the process of renting a vehicle. Whether you need a car for a business trip, vacation, or daily commute, our system provides a seamless booking experience with a wide range of vehicles to choose from. </p>
               <ul class="list-unstyled social">
                 <li><a href="#"><span class="icon-facebook"></span></a></li>
                 <li><a href="#"><span class="icon-instagram"></span></a></li>
@@ -285,40 +267,40 @@ $result = $stmt->get_result();
                   <h2 class="footer-heading mb-4">Quick Links</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Resources</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Support</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Company</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
               </div>
@@ -329,7 +311,7 @@ $result = $stmt->get_result();
               <div class="border-top pt-5">
                 <p>
               <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart text-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a>
+              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with RIDE NOW RENTALS</a>
               <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
               </p>
               </div>

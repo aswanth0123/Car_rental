@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'vendor') {
+if (!isset($_SESSION['vendor_id']) || $_SESSION['role'] !== 'vendor') {
     header("Location: login.php");
     exit;
 }
@@ -12,7 +12,7 @@ $category_result = $conn->query($category_query);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect form data
     $category_id = $_POST['category_id'];
-    $vendor_id = $_SESSION['user_id'];
+    $vendor_id = $_SESSION['vendor_id'];
     $name = $_POST['name'];
     $vehicle_number = $_POST['vehicle_number'];
     $rc_number = $_POST['rc_number'];
@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h1>Admin Panel</h1>
         <ul class="utilities">
           <br>
-          <li class="users"><a href="#">My Account</a></li>
+          <li class="users"><a href="profile.php">My Account</a></li>
           <li class="logout warn"><a href="../logout.php">Log Out</a></li>
         </ul>
       </header>
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <li class=""><a href="view_cars.php">View Cars</a></li>
           <li class=""><a href="add_cate.php">View Category</a></li>
           <li class=""><a href="bookings.php">Manage Bookings</a></li>
-          <li class=""><a href="view_feedbacks">feedbacks</a></li>
+          <li class=""><a href="view_feedback.php">feedbacks</a></li>
 
         </ul>
       </nav>

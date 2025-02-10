@@ -11,9 +11,13 @@ $user_id = $_SESSION['user_id'];
 $vehicle_id = intval($_GET['car_id']);
 
 // Fetch vehicle details
-$query = "SELECT c.*, cat.category_name FROM cars c 
-          JOIN car_categories cat ON c.CAT_ID = cat.ID 
-          WHERE c.vehicle_id = ?";
+$query = "SELECT c.*, cat.category_name, 
+v.address AS vendor_address, v.phone_number AS vendor_phone, 
+v.email AS vendor_email
+FROM cars c
+JOIN car_categories cat ON c.CAT_ID = cat.ID
+JOIN vendor v ON c.vendor_id = v.vendor_id
+WHERE c.vehicle_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $vehicle_id);
 $stmt->execute();
@@ -27,7 +31,6 @@ if (!$car) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $customer_id = 1; // Replace with the logged-in user's ID
     $pickup = $_POST['pickup'];
     $dropoff = $_POST['dropoff'];
     $loc = $pickup . '-' . $dropoff;
@@ -65,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 
   <head>
-    <title>CarRental &mdash; Free Website Template by Colorlib</title>
+    <title>RIDE NOW RENTALS &mdash; Free Website Template by Colorlib</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -109,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <div class="col-3">
               <div class="site-logo">
-                <a href="index.html"><strong>CarRental</strong></a>
+                <a href="../index.php"><strong>RIDE NOW RENTALS</strong></a>
               </div>
             </div>
 
@@ -119,21 +122,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
               <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
                 <ul class="site-menu main-menu js-clone-nav ml-auto ">
-                  <li><a href="../index.php" class="nav-link">Home</a></li>
-                  <li><a href="listing.html" class="nav-link">Listing</a></li>
-                  <li><a href="testimonials.html" class="nav-link">Testimonials</a></li>
-                  <li><a href="blog.html" class="nav-link">Blog</a></li>
-                  <li><a href="about.html" class="nav-link">About</a></li>
-                  <li class=""><a href="contact.html" class="nav-link">Contact</a></li>
+                  <li ><a href="../index.php" class="nav-link">Home</a></li>
+                  <li><a href="../reviews.php" class="nav-link">Reviews</a></li>
+                  <li><a href="../about.php" class="nav-link">About</a></li>
                   <?php
                
-               if (isset($_SESSION['user_id'])) {
-                 echo '<li><a href="logout.php" class="nav-link">Bookings</a></li>';
-                 echo '<li><a href="logout.php" class="nav-link">logout</a></li>';
-               } else {
-                   echo '<li><a href="login.php" class="nav-link">login</a></li>';
-               }
-               ?>
+                  if (isset($_SESSION['user_id'])) {
+                    echo '<li class="active"><a href="user_side/view_bookings.php" class="nav-link">Bookings</a></li>';
+                    echo '<li><a href="../logout.php" class="nav-link">logout</a></li>';
+                  } else {
+                      echo '<li><a href="login.php" class="nav-link">login</a></li>';
+                  }
+                  ?>
                 </ul>
               </nav>
             </div>
@@ -152,8 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-lg-5">
 
               <div class="intro">
-                <h1><strong>About</strong></h1>
-                <div class="custom-breadcrumbs"><a href="index.html">Home</a> <span class="mx-2">/</span> <strong>About</strong></div>
+                <h1><strong>Rent</strong></h1>
+                <div class="custom-breadcrumbs"><a href="index.html">Home</a> <span class="mx-2">/</span> <strong>Rent</strong></div>
               </div>
 
             </div>
@@ -167,8 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="container">
         <div class="row justify-content-center text-center">
         <div class="col-7 text-center mb-5">
-          <h2>Contact Us Or Use This Form To Rent A Car</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo assumenda, dolorum necessitatibus eius earum voluptates sed!</p>
+          <h2>Book Your Dream Car</h2>
+          <p></p>
         </div>
       </div>
         <div class="row">
@@ -176,22 +176,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form action="" method="post">
               <div class="form-group row">
                 <div class="col-md-6 mb-4 mb-lg-0">
-                  <input type="text" class="form-control" placeholder="pickup location" name="pickup">
+                  <input type="text" class="form-control" placeholder="pickup location" name="pickup" required>
                 </div>
                 <div class="col-md-6">
-                  <input type="text" class="form-control" placeholder="dropoff location" name="dropoff">
+                  <input type="text" class="form-control" placeholder="dropoff location" name="dropoff" required>
                 </div>
               </div>
               <div class="form-group row">
   
               <div class="col-md-6">
                 <label for="">Pickup Date & Time</label>
-                  <input type="datetime-local" class="form-control" id="pickupDate" name="pickup_date" placeholder="Pickup Date & Time">
+                  <input type="datetime-local" class="form-control" id="pickupDate" name="pickup_date" placeholder="Pickup Date & Time" required >
               </div>
               <div class="col-md-6">
               <label for="">Dropoff Date & Time</label>
 
-                  <input type="datetime-local" class="form-control" id="dropoffDate" name="dropoff_date" placeholder="Dropoff Date & Time">
+                  <input type="datetime-local" class="form-control" id="dropoffDate" name="dropoff_date" placeholder="Dropoff Date & Time" required>
               </div>
             </div>
             <div class="form-group row">
@@ -215,9 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <ul class="list-unstyled footer-link">
                 <li class="d-block mb-3">
                   <span class="d-block text-black">Address:</span>
-                  <span>34 Street Name, City Name Here, United States</span></li>
-                <li class="d-block mb-3"><span class="d-block text-black">Phone:</span><span>+1 242 4942 290</span></li>
-                <li class="d-block mb-3"><span class="d-block text-black">Email:</span><span>info@yourdomain.com</span></li>
+                  <span><?php echo $car['vendor_address']; ?></span></li>
+                <li class="d-block mb-3"><span class="d-block text-black">Phone:</span><span><?php echo $car['vendor_phone']; ?></span></li>
+                <li class="d-block mb-3"><span class="d-block text-black">Email:</span><span><?php echo $car['vendor_email']; ?></span></li>
               </ul>
             </div>
           </div>
@@ -227,12 +227,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
       
-      <footer class="site-footer">
+    <footer class="site-footer">
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
               <h2 class="footer-heading mb-4">About Us</h2>
-              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. </p>
+              <p>Welcome to our Car Rental System, a convenient and user-friendly platform designed to simplify the process of renting a vehicle. Whether you need a car for a business trip, vacation, or daily commute, our system provides a seamless booking experience with a wide range of vehicles to choose from. </p>
               <ul class="list-unstyled social">
                 <li><a href="#"><span class="icon-facebook"></span></a></li>
                 <li><a href="#"><span class="icon-instagram"></span></a></li>
@@ -246,41 +246,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <h2 class="footer-heading mb-4">Quick Links</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
-
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Resources</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Support</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
                 <div class="col-lg-3">
                   <h2 class="footer-heading mb-4">Company</h2>
                   <ul class="list-unstyled">
                     <li><a href="#">About Us</a></li>
-                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="reviews.php">Reviews</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
                   </ul>
                 </div>
               </div>
@@ -291,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <div class="border-top pt-5">
                 <p>
               <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart text-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a>
+              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with RIDE NOW RENTALS</a>
               <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
               </p>
               </div>

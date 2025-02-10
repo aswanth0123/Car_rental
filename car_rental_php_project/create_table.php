@@ -11,11 +11,18 @@ $queries = [
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone_number VARCHAR(20) UNIQUE NOT NULL,
-        role ENUM('vendor', 'customer') NOT NULL,
-        company_registration_number VARCHAR(50) NULL,
         driving_license_number VARCHAR(50) NULL,
         address TEXT NOT NULL,
         password VARCHAR(255) NOT NULL
+    )",
+    "CREATE TABLE IF NOT EXISTS vendor (
+            vendor_id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            phone_number VARCHAR(20) UNIQUE NOT NULL,
+            company_registration_number VARCHAR(50) NULL,
+            address TEXT NOT NULL,
+            password VARCHAR(255) NOT NULL
     )",
 
     // Categories Table
@@ -41,7 +48,7 @@ $queries = [
         vehicle_image VARCHAR(255) NOT NULL,
         price DECIMAL(10,2) NOT NULL,
         FOREIGN KEY (cat_id) REFERENCES car_categories(id) ON DELETE CASCADE,
-        FOREIGN KEY (vendor_id) REFERENCES users(user_id) ON DELETE CASCADE
+        FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id) ON DELETE CASCADE
     )",
 
     // Locations Table
@@ -61,18 +68,25 @@ $queries = [
         location_id INT NOT NULL,
         total_amount DECIMAL(10,2) NOT NULL,
         status ENUM('confirmed', 'cancelled', 'completed') DEFAULT 'confirmed',
-        FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (customer_id) REFERENCES users(user_id) ON DELETE CASCADE,
         FOREIGN KEY (vehicle_id) REFERENCES cars(vehicle_id) ON DELETE CASCADE,
         FOREIGN KEY (location_id) REFERENCES pickup_dropoff_location(id) ON DELETE CASCADE
     )",
 
     // Feedback Table
-    "CREATE TABLE IF NOT EXISTS feedback (
-        feedback_id INT AUTO_INCREMENT PRIMARY KEY,
-        customer_id INT NOT NULL,
-        description TEXT NOT NULL,
-        REVIEW_TIMESTAMP TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE
+    "CREATE TABLE IF NOT EXISTS Feedback (
+        FeedbackID INT AUTO_INCREMENT PRIMARY KEY, 
+        CustomerID INT NOT NULL,                   
+        FeedbackDescription TEXT NOT NULL,         
+        ReviewDateTime DATETIME NOT NULL,          
+        FOREIGN KEY (CustomerID) REFERENCES users(user_id) 
+    )",
+
+    //admin
+    "create table IF NOT EXISTS admin(
+    admin_id int auto_increment primary key,
+    email varchar(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
     )"
 ];
 

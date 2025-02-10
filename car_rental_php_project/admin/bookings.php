@@ -1,25 +1,25 @@
 <?php
 session_start();
-if (!isset($_SESSION['vendor_id']) || $_SESSION['role'] !== 'vendor') {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
 require_once '../db.php';
-$vendor_id = $_SESSION['vendor_id']; // Get the logged-in customer ID
-$query = "
-    SELECT rent.rent_id, users.name AS customer_name, rent.customer_id, cars.vehicle_name, 
-           rent.pickup_timestamp, rent.return_timestamp, rent.total_amount, rent.status 
-    FROM rent
-    JOIN cars ON rent.vehicle_id = cars.vehicle_id
-    JOIN users ON rent.customer_id = users.user_id
-    WHERE cars.vendor_id = ?
-    ORDER BY rent.pickup_timestamp DESC
-";
+// Fetch all bookings with user, vendor, car, and location details
+$sql = "SELECT 
+            rent.rent_id, rent.pickup_timestamp, rent.return_timestamp, rent.total_amount, rent.status,
+            users.name AS customer_name,
+            vendor.name AS vendor_name,
+            cars.vehicle_name AS car_name,
+            pickup_dropoff_location.loc_name AS pickup_location
+        FROM rent
+        JOIN users ON rent.customer_id = users.user_id
+        JOIN cars ON rent.vehicle_id = cars.vehicle_id
+        JOIN vendor ON cars.vendor_id = vendor.vendor_id
+        JOIN pickup_dropoff_location ON rent.location_id = pickup_dropoff_location.id
+        ORDER BY rent.pickup_timestamp DESC";
 
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $vendor_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -35,22 +35,22 @@ $result = $stmt->get_result();
 <body>
     
     <header role="banner">
-        <h1>Vendor Panel</h1>
+        <h1>Admin Panel</h1>
         <ul class="utilities">
           <br>
-          <li class="users"><a href="profile.php">My Account</a></li>
           <li class="logout warn"><a href="../logout.php">Log Out</a></li>
         </ul>
       </header>
       
       <nav role='navigation'>
-        <ul class="main">
-          <li class=""><a href="vendor_dashboard.php">Dashboard</a></li>
-          <li class=""><a href="add_cars.php">Add Cars</a></li>
-          <li class=""><a href="view_cars.php">View Cars</a></li>
-          <li class=""><a href="add_cate.php">View Category</a></li>
-          <li class=""><a href="bookings.php">Manage Bookings</a></li>
-          <li class=""><a href="view_feedback.php">feedbacks</a></li>
+      <ul class="main">
+          <li class=""><a href="home.php">Dashboard</a></li>
+          <li class=""><a href="cars.php">Cars</a></li>
+          <li class=""><a href="users.php">users</a></li>
+          <li class=""><a href="vendors.php">Vendors</a></li>
+          <li class=""><a href="cates.php">Categorys</a></li>
+          <li class=""><a href="bookings.php">Bookings</a></li>
+          <li class=""><a href="feedbacks.php">feedbacks</a></li>
 
         </ul>
       </nav>
@@ -59,11 +59,11 @@ $result = $stmt->get_result();
         <div class="container my-4" >
             <h1 class="text-center">View User Bookings</h1>
             <!-- Products Table --> 
-            <table class="table table-striped">
+            <table class="table table-striped" style="width:92%">
                 <thead>
                     <tr>
-                        <th>Booking ID</th>
                         <th>Customer</th>
+                        <th>vendor</th>
                         <th>Car</th>
                         <th>Pickup Date</th>
                         <th>Return Date</th>
@@ -74,9 +74,9 @@ $result = $stmt->get_result();
                 <tbody>
                     <?php while ($row = $result->fetch_assoc()) { ?>
                         <tr>
-                            <td><?php echo $row['rent_id']; ?></td>
                             <td><?php echo htmlspecialchars($row['customer_name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['vehicle_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['vendor_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['car_name']); ?></td>
                             <td><?php echo date('d M Y', strtotime($row['pickup_timestamp'])); ?></td>
                             <td><?php echo date('d M Y', strtotime($row['return_timestamp'])); ?></td>
                             <td>₹<?php echo number_format($row['total_amount'], 2); ?></td>

@@ -12,20 +12,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
-
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['role'] = $user['role'];
-
-        if ($user['role'] === 'vendor') {
-            header("Location: vendor_side/vendor_dashboard.php");
-        } else {
-            header("Location: index.php");
+    
+    if ($user) {
+        // Verify Password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['role'] = 'user';
+            header("Location: index.php"); // Redirect customer
+            exit;
         }
-        exit;
-    } else {
-        echo "Invalid credentials!";
     }
+    
+    // Check in Vendors Table
+    $sql = "SELECT * FROM vendor  WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    
+    if ($user) {
+        // Verify Password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['vendor_id'] = $user['vendor_id'];
+            $_SESSION['role'] = 'vendor';
+            header("Location: vendor_side/vendor_dashboard.php"); // Redirect vendor
+            exit;
+        }
+    }
+
+    // check in admin table
+    $sql = "select * from admin where email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $admin = $result->fetch_assoc();
+    
+    if ($admin) {
+        // Verify Password
+        if (password_verify($password, $admin['password'])) {
+            $_SESSION['admin_id'] = $admin['admin_id'];
+            header("Location: admin/home.php"); // Redirect vendor
+            exit;
+        }
+    }
+
+
 }
 ?>
 <link rel="stylesheet" href="css/login.css">
@@ -59,5 +92,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </label>
             <button class="login__submit" type="submit" >Sign in</button>
         </form>
-        <a href="/" class="login__forgot">Home page without login ?</a>
+        <a href="index.php" class="login__forgot">Home page without login ?</a>
     </div>

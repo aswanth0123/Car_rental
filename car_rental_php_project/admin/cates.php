@@ -1,10 +1,9 @@
 <?php
 session_start();
-if (!isset($_SESSION['vendor_id']) || $_SESSION['role'] !== 'vendor') {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: ../login.php");
     exit;
 }
-echo " Welcome to the Admin Dashboard!";
 require_once '../db.php';
 
 $category_query = "SELECT * FROM car_categories";
@@ -16,20 +15,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt =$conn->prepare("INSERT INTO car_categories (category_name,description) VALUES (?,?)");
     $stmt->bind_param("ss", $name,$description);
     if ($stmt->execute()) {
-        header("Location: add_cate.php");
+        header("Location: cates.php");
     };
     $stmt->close();
 }
 
 ?>
 
-<a href="../logout.php">Logout</a>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Home</title>
+    <title>Category</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../css/admin_home.css">
@@ -37,23 +35,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     
     <header role="banner">
-        <h1>Vendor Panel</h1>
-        <ul class="utilities">
+    <h1>Admin Panel</h1>
+    <ul class="utilities">
           <br>
-          <li class="users"><a href="profile.php">My Account</a></li>
-          <li class="logout warn"><a href="../logout.php">Log Out</a></li>
+                    <li class="logout warn"><a href="../logout.php">Log Out</a></li>
         </ul>
       </header>
       
       <nav role='navigation'>
         <ul class="main">
-        <li class=""><a href="vendor_dashboard.php">Dashboard</a></li>
-          <li class=""><a href="add_cars.php">Add Cars</a></li>
-          <li class=""><a href="view_cars.php">View Cars</a></li>
-          <li class=""><a href="add_cate.php">View Category</a></li>
-          <li class=""><a href="bookings.php">Manage Bookings</a></li>
-          <li class=""><a href="view_feedback.php">feedbacks</a></li>
-
+          <li class=""><a href="home.php">Dashboard</a></li>
+          <li class=""><a href="cars.php">Cars</a></li>
+          <li class=""><a href="users.php">users</a></li>          
+          <li class=""><a href="vendors.php">Vendors</a></li>
+          <li class=""><a href="cates.php">Categorys</a></li>
+          <li class=""><a href="bookings.php">Bookings</a></li>
+          <li class=""><a href="feedbacks.php">feedbacks</a></li>
         </ul>
       </nav>
       <main role="main">
