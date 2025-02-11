@@ -3,65 +3,23 @@ require_once '../db.php';
 session_start();
 
 // Check if vehicle_id is provided
-if (!isset($_GET['car_id'])) {
+if (!isset($_GET['rent_id'])) {
     die("Vehicle ID not provided.");
 }
 $user_id = $_SESSION['user_id'];
 
-$vehicle_id = intval($_GET['car_id']);
+$rent_id = intval($_GET['rent_id']);
 
-// Fetch vehicle details
-$query = "SELECT c.*, cat.category_name, 
-v.address AS vendor_address, v.phone_number AS vendor_phone, 
-v.email AS vendor_email
-FROM cars c
-JOIN car_categories cat ON c.CAT_ID = cat.ID
-JOIN vendor v ON c.vendor_id = v.vendor_id
-WHERE c.vehicle_id = ?";
+$query = "SELECT r.TOTAL_AMOUNT, u.name
+          FROM rent r
+          JOIN users u ON r.customer_id = u.user_id
+          WHERE r.rent_id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $vehicle_id);
+$stmt->bind_param("i", $rent_id);
 $stmt->execute();
 $result = $stmt->get_result();
-$car = $result->fetch_assoc();
-$price_per_day = $car['price'];
-
-if (!$car) {
-    die("Car not found.");
-}
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $pickup = $_POST['pickup'];
-    $dropoff = $_POST['dropoff'];
-    $loc = $pickup . '-' . $dropoff;
-    $query1 = "INSERT INTO pickup_dropoff_location (LOC_NAME) VALUES (?)";
-    $stmt1 = $conn->prepare($query1);
-    $stmt1->bind_param("s",$loc);
-    $stmt1->execute();
-    $location_id = $conn->insert_id;
-    $rent_date = date("Y-m-d H:i:s");
-
-
-
-    $pickup_date = $_POST['pickup_date'];
-    $return_date = $_POST['dropoff_date'];
-    $total_rent = $_POST['total'];
-
-    // Insert into rent table
-    $query = "INSERT INTO rent (customer_id, vehicle_id,RENT_TIMESTAMP, PICKUP_TIMESTAMP, RETURN_TIMESTAMP, LOCATION_ID, TOTAL_AMOUNT)
-              VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("iisssid", $user_id, $vehicle_id, $rent_date, $pickup_date, $return_date, $location_id, $total_rent);
-    
-    if ($stmt->execute()) {
-      $rent_id = $conn->insert_id;
-
-      header("Location: payment.php?rent_id=" . $rent_id);
-      exit();
-    } else {
-        echo "Error: " . $conn->error;
-    }
-}
+$rent_details = $result->fetch_assoc();
+$adv_pr = $rent_details['TOTAL_AMOUNT']*0.20;
 ?>
 
 
@@ -176,64 +134,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       </div>
         <div class="row">
           <div class="col-lg-8 mb-5" >
-            <form action="" method="post">
-              <div class="form-group row">
-                <div class="col-md-6 mb-4 mb-lg-0">
-                  <input type="text" class="form-control" placeholder="pickup location" name="pickup" required>
-                </div>
-                <div class="col-md-6">
-                  <input type="text" class="form-control" placeholder="dropoff location" name="dropoff" required>
-                </div>
-              </div>
-              <div class="form-group row">
-  
-              <div class="col-md-6">
-                <label for="">Pickup Date & Time</label>
-                  <input type="datetime-local" class="form-control" id="pickupDate" name="pickup_date" placeholder="Pickup Date & Time" required >
-              </div>
-              <div class="col-md-6">
-              <label for="">Dropoff Date & Time</label>
-
-                  <input type="datetime-local" class="form-control" id="dropoffDate" name="dropoff_date" placeholder="Dropoff Date & Time" required>
-              </div>
-            </div>
+            <form>
+          
             <div class="form-group row">
 
                 <div class="col-md-6">
                     <Label>Amount to Pay</Label>
-                    <input type="text" class="form-control" id="total" name="total" placeholder="0" readonly>
+                    <input type="text" class="form-control" id="total" value="<?php echo $rent_details['TOTAL_AMOUNT']; ?>" readonly>
                 </div>
-                
-                <!-- <div class="col-md-6">
-                    <Label>Enter advance Amount</Label>
-                    <input type="text" class="form-control" id="adv" placeholder="0" >
-                </div> -->
+             
+                <div class="col-md-6">
+                    <Label>Enter Advance Amount to Pay(min 20%)</Label>
+                    <input type="number" class="form-control" id="amount" value="<?php echo $adv_pr; ?>" max="<?php echo $rent_details['TOTAL_AMOUNT']; ?>" min="<?php echo $rent_details['TOTAL_AMOUNT'] * 0.2; ?>" required>
+                </div>
             </div>
               <div class="form-group row">
                 <div class="col-md-6 mr-auto">
-                  <input type="submit" class="btn btn-block btn-primary text-white py-3 px-5" value="Rent Now">
+                <input type="text" class="form-control" id="rent_id" value="<?php echo $rent_id; ?>" hidden>
+
+                  <button type="button" class="btn btn-block btn-primary text-white py-3 px-5" onclick="sample()">pay now </button>
                 </div>
                 
               </div>
             </form>
           </div>
-          <div class="col-lg-4 ml-auto">
-            <div class="bg-white p-3 p-md-5">
-              <h3 class="text-black mb-4">Contact Info</h3>
-              <ul class="list-unstyled footer-link">
-                <li class="d-block mb-3">
-                  <span class="d-block text-black">Address:</span>
-                  <span><?php echo $car['vendor_address']; ?></span></li>
-                <li class="d-block mb-3"><span class="d-block text-black">Phone:</span><span><?php echo $car['vendor_phone']; ?></span></li>
-                <li class="d-block mb-3"><span class="d-block text-black">Email:</span><span><?php echo $car['vendor_email']; ?></span></li>
-              </ul>
-            </div>
-          </div>
+        
         </div>
       </div>
     </div>
 
-
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src=sample.js></script>
+    <script>
+        function pay_now(){
+            var rent_id= jQuery('#rent_id').val();
+            var amount= jQuery('#amount').val();
+            var total = jQuery('#total').val();
+            console.log('rent',rent_id);
+            console.log('amount',amount);
+            console.log('total',total);
+            
+            jQuery.ajax({
+                type:'POST',
+                url:'payment_process.php',
+                data:"amount=" + amount + '&rent_id='+rent_id+'&total='+total,
+                success:function(result){
+                    var options = {
+                        "key": "rzp_test_jOgzwF2bu1fdVA", // Enter the Key ID generated from the Dashboard
+                        "amount": amount*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "currency": "INR",
+                        "name": "Acme Corp",
+                        "description": "Test Transaction",
+                        "image": "https://example.com/your_logo",
+                        "handler": function (response){
+                            jQuery.ajax({
+                                type:'POST',
+                                url:'payment_process.php',
+                                data:'payment_id='+response.razorpay_payment_id,
+                                success:function(result){
+                                    window.location.href='../index.php'
+                                }
+                            });
+                        }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            }
+        })
+        }
+    </script>
       
     <footer class="site-footer">
         <div class="container">
@@ -323,54 +293,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="../js/aos.js"></script>
 
     <script src="../js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const pickupInput = document.getElementById("pickupDate");
-            const dropoffInput = document.getElementById("dropoffDate");
-
-            if (pickupInput && dropoffInput) {
-                // Set minimum pickup date (tomorrow)
-                const now = new Date();
-                now.setDate(now.getDate() + 1);
-                pickupInput.min = now.toISOString().slice(0, 16);
-
-                // Update dropoff date when pickup date is selected
-                pickupInput.addEventListener("change", function () {
-                    if (pickupInput.value) {
-                        let pickupDate = new Date(pickupInput.value);
-                        pickupDate.setDate(pickupDate.getDate() + 1); // Add 1 day for dropoff
-
-                        dropoffInput.min = pickupDate.toISOString().slice(0, 16);
-                        dropoffInput.value = dropoffInput.min; // Set default dropoff date
-                        let pricePerDay = <?php echo $price_per_day; ?>;
-                        let totalAmountField = document.getElementById("total");
-                        totalAmountField.value = pricePerDay;
-                    }
-                });
-                dropoffInput.addEventListener("change", function () {
-                    let pricePerDay = <?php echo $price_per_day; ?>;
-                    let totalAmountField = document.getElementById("total");
-                    let pickup = new Date(pickupDate.value);
-                let returnD = new Date(dropoffDate.value);
-                let timeDiff = returnD - pickup;
-                let days = timeDiff / (1000 * 3600 * 24);
-                    console.log(days);
-                    if (days<1) {
-                        totalAmountField.value = pricePerDay;
-
-                    }else{
-                        let totalAmount = days * pricePerDay;
-                        totalAmountField.value = totalAmount.toFixed(2);
-                    }
-                    
-                
-
-                    
-                
-                })
+        function pay_now(){
+            var rent_id= jQuery('#rent_id').val();
+            var amount= jQuery('#amount').val();
+            var total = jQuery('#total').val();
+            console.log(rent_id,amount);
+            
+            jQuery.ajax({
+                type:'POST',
+                url:'payment_process.php',
+                data:"amount=" + amount + '&rent_id='+rent_id+'&total='+total,
+                success:function(result){
+                    var options = {
+                        "key": "rzp_test_jOgzwF2bu1fdVA", // Enter the Key ID generated from the Dashboard
+                        "amount": amount*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "currency": "INR",
+                        "name": "Acme Corp",
+                        "description": "Test Transaction",
+                        "image": "https://example.com/your_logo",
+                        "handler": function (response){
+                            jQuery.ajax({
+                                type:'POST',
+                                url:'payment_process.php',
+                                data:'payment_id='+response.razorpay_payment_id,
+                                success:function(result){
+                                    window.location.href='../index.php'
+                                }
+                            });
+                        }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
             }
-        });
-    </script> 
+        })
+        }
+    </script>
   </body>
 
 </html>

@@ -87,7 +87,20 @@ $queries = [
     admin_id int auto_increment primary key,
     email varchar(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL
-    )"
+    )",
+    "CREATE TABLE payment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    rent_id INT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    payment_mode ENUM('UPI', 'Card') NOT NULL,
+    payment_status ENUM('success', 'failed', 'pending') NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_id VARCHAR(255) NULL,
+    advance_amount DECIMAL(10,2) DEFAULT 0.00 ,
+    remaining_amount DECIMAL(10,2) DEFAULT 0.00,
+    misc_charges DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (rent_id) REFERENCES rent(rent_id) ON DELETE CASCADE
+)"
 ];
 
 // Execute each query
