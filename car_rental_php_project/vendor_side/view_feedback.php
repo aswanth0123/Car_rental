@@ -56,7 +56,7 @@ $result = $stmt->get_result();
         <div class="container my-4" >
             <h1 class="text-center">View User Reviews</h1>
             <!-- Products Table --> 
-            <table class="table table-striped">
+            <table class="table table-striped" style="width:92%">
                 <thead>
                     <tr>
                         <th>Customer</th>

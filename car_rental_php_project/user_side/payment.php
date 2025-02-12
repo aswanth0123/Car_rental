@@ -145,7 +145,7 @@ $adv_pr = $rent_details['TOTAL_AMOUNT']*0.20;
              
                 <div class="col-md-6">
                     <Label>Enter Advance Amount to Pay(min 20%)</Label>
-                    <input type="number" class="form-control" id="amount" value="<?php echo $adv_pr; ?>" max="<?php echo $rent_details['TOTAL_AMOUNT']; ?>" min="<?php echo $rent_details['TOTAL_AMOUNT'] * 0.2; ?>" required>
+                    <input type="number" class="form-control" id="amount" value="<?php echo ceil($adv_pr); ?>" max="<?php echo $rent_details['TOTAL_AMOUNT']; ?>" min="<?php echo ceil($rent_details['TOTAL_AMOUNT'] * 0.2) ?>" required>
                 </div>
             </div>
               <div class="form-group row">

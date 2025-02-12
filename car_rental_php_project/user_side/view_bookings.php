@@ -216,10 +216,10 @@ $result = $stmt->get_result();
         
         <!-- Modal body -->
         <div class="modal-body">
-        <form action="" method="POST">
+        <form action="mark_rev.php" method="POST">
             <div class="form-group">
                 <label for="feedback">Feedback:</label>
-                <input type="text" class="form-control" id="feedback" name="feedback" required>
+                <input type="text" class="form-control" id="feedback" name="rev" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

@@ -31,37 +31,52 @@ if (!$car) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $pickup = $_POST['pickup'];
-    $dropoff = $_POST['dropoff'];
-    $loc = $pickup . '-' . $dropoff;
-    $query1 = "INSERT INTO pickup_dropoff_location (LOC_NAME) VALUES (?)";
-    $stmt1 = $conn->prepare($query1);
-    $stmt1->bind_param("s",$loc);
-    $stmt1->execute();
-    $location_id = $conn->insert_id;
-    $rent_date = date("Y-m-d H:i:s");
+  $pickup = $_POST['pickup'];
+  $dropoff = $_POST['dropoff'];
+  $loc = $pickup . '-' . $dropoff;
+  $pickup_date = $_POST['pickup_date']; // The date user selects for pickup
+  $return_date = $_POST['dropoff_date'];
+  $total_rent = $_POST['total'];
 
+  $rent_date = date("Y-m-d H:i:s");
+  $pickup_date_only = date("Y-m-d", strtotime($pickup_date_time));
 
+  // **Step 1: Check if the customer already has a booking on the same day**
+  $check_query = "SELECT COUNT(*) FROM rent WHERE DATE(PICKUP_TIMESTAMP) = ?";
+  $stmt_check = $conn->prepare($check_query);
+  $stmt_check->bind_param("s", $pickup_date_only);
+  $stmt_check->execute();
+  $stmt_check->bind_result($booking_count);
+  $stmt_check->fetch();
+  $stmt_check->close();
 
-    $pickup_date = $_POST['pickup_date'];
-    $return_date = $_POST['dropoff_date'];
-    $total_rent = $_POST['total'];
+  if ($booking_count > 0) {
+      echo "<script>alert('You have already booked a car for this day! Please choose another date.');</script>";
+      exit();
+  }
 
-    // Insert into rent table
-    $query = "INSERT INTO rent (customer_id, vehicle_id,RENT_TIMESTAMP, PICKUP_TIMESTAMP, RETURN_TIMESTAMP, LOCATION_ID, TOTAL_AMOUNT)
-              VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("iisssid", $user_id, $vehicle_id, $rent_date, $pickup_date, $return_date, $location_id, $total_rent);
-    
-    if ($stmt->execute()) {
+  // **Step 2: Insert Location**
+  $query1 = "INSERT INTO pickup_dropoff_location (LOC_NAME) VALUES (?)";
+  $stmt1 = $conn->prepare($query1);
+  $stmt1->bind_param("s", $loc);
+  $stmt1->execute();
+  $location_id = $conn->insert_id;
+
+  // **Step 3: Insert into Rent Table**
+  $query = "INSERT INTO rent (customer_id, vehicle_id, RENT_TIMESTAMP, PICKUP_TIMESTAMP, RETURN_TIMESTAMP, LOCATION_ID, TOTAL_AMOUNT)
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
+  $stmt = $conn->prepare($query);
+  $stmt->bind_param("iisssid", $user_id, $vehicle_id, $rent_date, $pickup_date, $return_date, $location_id, $total_rent);
+
+  if ($stmt->execute()) {
       $rent_id = $conn->insert_id;
-
       header("Location: payment.php?rent_id=" . $rent_id);
       exit();
-    } else {
-        echo "Error: " . $conn->error;
-    }
+  } else {
+      echo "Error: " . $conn->error;
+  }
 }
+
 ?>
 
 
@@ -131,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <?php
                
                   if (isset($_SESSION['user_id'])) {
-                    echo '<li class="active"><a href="user_side/view_bookings.php" class="nav-link">Bookings</a></li>';
+                    echo '<li class="active"><a href="view_bookings.php" class="nav-link">Bookings</a></li>';
                     echo '<li><a href="../logout.php" class="nav-link">logout</a></li>';
                   } else {
                       echo '<li><a href="login.php" class="nav-link">login</a></li>';

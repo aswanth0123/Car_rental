@@ -6,20 +6,23 @@ if (!isset($_SESSION['admin_id'])) {
 }
 require_once '../db.php';
 // Fetch all bookings with user, vendor, car, and location details
-$sql = "SELECT 
-            rent.rent_id, rent.pickup_timestamp, rent.return_timestamp, rent.total_amount, rent.status,
-            users.name AS customer_name,
-            vendor.name AS vendor_name,
-            cars.vehicle_name AS car_name,
-            pickup_dropoff_location.loc_name AS pickup_location
-        FROM rent
-        JOIN users ON rent.customer_id = users.user_id
-        JOIN cars ON rent.vehicle_id = cars.vehicle_id
-        JOIN vendor ON cars.vendor_id = vendor.vendor_id
-        JOIN pickup_dropoff_location ON rent.location_id = pickup_dropoff_location.id
-        ORDER BY rent.pickup_timestamp DESC";
+$query = "
+    SELECT 
+        users.name AS customer_name, 
+        rent.rent_id, 
+        rent.total_amount, 
+        payment.payment_status, 
+        payment.payment_id, 
+        payment.advance_amount AS advance_amount, 
+        payment.payment_date AS payment_date, 
+        payment.remaining_amount AS remaining_amount
+    FROM payment
+    JOIN rent ON payment.rent_id = rent.rent_id
+    JOIN users ON rent.customer_id = users.user_id
+    ORDER BY payment.payment_date DESC
+";
 
-$result = $conn->query($sql);
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -57,36 +60,33 @@ $result = $conn->query($sql);
       <main role="main">
         
         <div class="container my-4" >
-            <h1 class="text-center">View User Bookings</h1>
+            <h1 class="text-center">View Payments</h1>
             <!-- Products Table --> 
             <table class="table table-striped" style="width:92%">
                 <thead>
                     <tr>
+                        <th>Rent Id</th>
                         <th>Customer</th>
-                        <th>vendor</th>
-                        <th>Car</th>
-                        <th>Pickup Date</th>
-                        <th>Return Date</th>
+                        <th>payment status</th>
+                        <th>payment Id</th>
                         <th>Total Amount</th>
-                        <th>Status</th>
+                        <th>Advance Amount</th>
+                        <th>Remaining Amount</th>
+                        <th>Payment Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($row = $result->fetch_assoc()) { ?>
                         <tr>
+                            <td><?php echo htmlspecialchars($row['rent_id']); ?></td>
                             <td><?php echo htmlspecialchars($row['customer_name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['vendor_name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['car_name']); ?></td>
-                            <td><?php echo date('d M Y', strtotime($row['pickup_timestamp'])); ?></td>
-                            <td><?php echo date('d M Y', strtotime($row['return_timestamp'])); ?></td>
-                            <td>₹<?php echo number_format($row['total_amount'], 2); ?></td>
-                            <td>
-                                <span class="badge bg-<?php 
-                                    echo ($row['status'] == 'confirmed') ? 'success' : 
-                                        (($row['status'] == 'cancelled') ? 'danger' : 'warning'); ?>">
-                                    <?php echo ucfirst($row['status']); ?>
-                                </span>
-                            </td>
+                            <td><?php echo htmlspecialchars($row['payment_status']); ?></td>
+                            <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
+                            <td><?php echo htmlspecialchars($row['total_amount']); ?></td>
+                            <td><?php echo htmlspecialchars($row['advance_amount']); ?></td>
+                            <td><?php echo htmlspecialchars($row['remaining_amount']); ?></td>
+                            <td><?php echo htmlspecialchars($row['payment_date']); ?></td>
+
                         </tr>
                     <?php } ?>
                 </tbody>

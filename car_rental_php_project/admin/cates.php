@@ -50,8 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <li class=""><a href="vendors.php">Vendors</a></li>
           <li class=""><a href="cates.php">Categorys</a></li>
           <li class=""><a href="bookings.php">Bookings</a></li>
-          <li class=""><a href="feedbacks.php">feedbacks</a></li>
-        </ul>
+           <li class=""><a href="feedbacks.php">feedbacks</a></li>
+          <li class=""><a href="payments.php">payments</a></li>        </ul>
       </nav>
       <main role="main">
     

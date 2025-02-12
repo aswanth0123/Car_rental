@@ -57,6 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
     }
+    else {
+        $_SESSION['error'] = "Invalid email or password!";
+        header("Location: login.php"); // Redirect back to login
+        exit;
+    }
 
 
 }
@@ -94,3 +99,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
         <a href="index.php" class="login__forgot">Home page without login ?</a>
     </div>
+    <script>
+        function showAlert(message) {
+            alert(message);
+        }
+    </script>
+    <?php
+    if (isset($_SESSION['error'])) {
+        echo "<script>showAlert('{$_SESSION['error']}');</script>";
+        unset($_SESSION['error']); // Remove the error after displaying
+    }
+    ?>
+ 

@@ -1,48 +1,56 @@
 <?php
 include 'db.php';
-
+session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['username'];
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
-    $phone_number=$_POST['phone_number'];
+    $phone_number = $_POST['phone_number'];
     $company_registration_number = $_POST['company_registration_number'] ?? null;
     $driving_license_number = $_POST['driving_license_number'] ?? null;
     $address = $_POST['address'] ?? null;
-    if($role == 'vendor'){
-        $sql = "INSERT INTO vendor (name, phone_number, email, company_registration_number, address, password) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssss",
-            $name,
-            $phone_number,
-            $email,
-            $company_registration_number,
-            $address,
-            $password);
-    }
-    else{
-        $sql = "INSERT INTO users (name, phone_number, email, driving_license_number, address, password) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssss",
-            $name,
-            $phone_number,
-            $email,
-            $driving_license_number,
-            $address,
-            $password);
-        
-    }
-    
 
-    if ($stmt->execute()) {
-        echo "Registration successful!";
-    } else {
-        echo "Error: " . $stmt->error;
+    try {
+        if ($role == 'vendor') {
+            $sql = "INSERT INTO vendor (name, phone_number, email, company_registration_number, address, password) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssss", $name, $phone_number, $email, $company_registration_number, $address, $password);
+        } else {
+            $sql = "INSERT INTO users (name, phone_number, email, driving_license_number, address, password) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssss", $name, $phone_number, $email, $driving_license_number, $address, $password);
+        }
+
+        $stmt->execute();
+        $_SESSION['success'] = "Registration successful!";
+        header("Location: login.php");
+        exit;
+    } catch (mysqli_sql_exception $e) {
+        if ($e->getCode() == 1062) { // Duplicate entry error
+            $_SESSION['error'] = "Email already exists! Please use a different email.";
+        } else {
+            $_SESSION['error'] = "Something went wrong. Please try again.";
+        }
+        header("Location: register.php");
+        exit;
     }
 }
 ?>
 <link rel="stylesheet" href="css/register.css">
+
+<?php
+    if (isset($_SESSION['error'])) {
+        echo "<script>alert('{$_SESSION['error']}');</script>";
+        unset($_SESSION['error']); // Clear error after displaying
+    }
+    if (isset($_SESSION['success'])) {
+        echo "<script>alert('{$_SESSION['success']}');</script>";
+        unset($_SESSION['success']); // Clear success message
+    }
+    ?>
 <div class="login-container">
         <form action="" class="form-login" method="POST">
             <ul class="login-nav">
@@ -112,3 +120,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
    
     </script>
+   
