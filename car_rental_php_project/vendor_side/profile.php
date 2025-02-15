@@ -12,9 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = $_POST['phone'];
     $company_registration_number = $_POST['company_registration_number'];
     $address = $_POST['address'];    
-    $sql = "UPDATE vendor SET name = ?, email = ?, phone_number = ?, address = ?, company_registration_number = ? WHERE vendor_id = ?";
+    $password = $_POST['password'];
+    if ($vendor['password']!=$password) {
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        
+    }
+    $sql = "UPDATE vendor SET name = ?, email = ?, phone_number = ?, address = ?, company_registration_number = ?,password = ? WHERE vendor_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssi", $name, $email, $phone, $address,$company_registration_number, $_SESSION['vendor_id']);
+    $stmt->bind_param("ssssssi", $name, $email, $phone, $address,$company_registration_number,$password, $_SESSION['vendor_id']);
     if ($stmt->execute()) {
         echo "Profile updated successfully!";
     } else {
@@ -95,6 +100,10 @@ $vendor = $result->fetch_assoc();
                                     <div class="mb-3">
                                         <label for="address" class="form-label">Address</label> 
                                         <input type="text" class="form-control" id="address" name="address" value="<?=$vendor['address']?>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password</label> 
+                                        <input type="password" class="form-control" id="password" name="password" value="<?=$vendor['password']?>" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Update Profile</button>
                                     <a href="delete_account.php" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account?')">Delete account</a>

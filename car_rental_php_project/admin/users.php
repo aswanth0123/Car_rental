@@ -48,7 +48,7 @@ $result = $stmt->get_result();
       <main role="main">
         
         <div class="container" >
-            <h1 class="text-center">View User Bookings</h1>
+            <h1 class="text-center">View Users</h1>
             <!-- Products Table --> 
             <table class="table table-striped" style="width:92%">
                 <thead>

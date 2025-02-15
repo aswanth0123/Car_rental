@@ -56,7 +56,7 @@ $result = $stmt->get_result();
         <!-- Manage Products Section -->
         <div class="section" id="products">
           <div class="bt" style="margin-left: 30px; margin-top: 15px; color: red;">
-            <h3>Manage Cars</h3><br>
+            <h3>Cars</h3><br>
           </div>
             <div class="container mt-3">
                 <div class="row">

@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="container">
         <div class="row justify-content-center text-center">
         <div class="col-7 text-center mb-5">
-          <h2>Book Your Dream Car</h2>
+          <h2>Book a Car</h2>
           <p></p>
         </div>
       </div>
