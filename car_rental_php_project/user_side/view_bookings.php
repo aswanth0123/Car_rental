@@ -105,7 +105,7 @@ $result = $stmt->get_result();
                   if (isset($_SESSION['user_id'])) {
                     echo '<li><a href="view_bookings.php" class="nav-link">Bookings</a></li>';
                     echo '<li><a href="profile.php" class="nav-link">profile</a></li>';
-                    echo '<li><a href="logout.php" class="nav-link">logout</a></li>';
+                    echo '<li><a href="../logout.php" class="nav-link">logout</a></li>';
                   } else {
                       echo '<li><a href="login.php" class="nav-link">login</a></li>';
                   }

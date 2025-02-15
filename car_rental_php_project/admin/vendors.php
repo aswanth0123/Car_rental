@@ -40,7 +40,9 @@ $result = $stmt->get_result();
           <li class=""><a href="cates.php">Categorys</a></li>
           <li class=""><a href="bookings.php">Bookings</a></li>
            <li class=""><a href="feedbacks.php">feedbacks</a></li>
-          <li class=""><a href="payments.php">payments</a></li>        </ul>
+          <li class=""><a href="payments.php">payments</a></li> 
+          <li class=""><a href="reports.php">Report</a></li>
+        </ul>
       </nav>   
       <main role="main">
         

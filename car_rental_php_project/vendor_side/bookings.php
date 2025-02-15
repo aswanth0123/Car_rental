@@ -118,7 +118,7 @@ $result = $stmt->get_result();
                                     <p>Customer Phone Number: <?php echo $row['phone_number']; ?></p>
                                     <p>Customer Address: <?php echo $row['address']; ?></p>
                                     <p>Car Name: <?php echo $row['vehicle_name']; ?></p>
-                                    <p>Pickup Location: <?php echo $row['loc_name']; ?></p>
+                                    <p>Pickup_Drop Location: <?php echo $row['loc_name']; ?></p>
                                 </div>
 
                                 <!-- Modal footer -->
